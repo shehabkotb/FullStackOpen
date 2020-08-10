@@ -1,1 +1,1 @@
-Assignment for FullStackOpen 2020
+Assignments for FullStackOpen 2020
