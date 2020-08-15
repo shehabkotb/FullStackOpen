@@ -17,7 +17,6 @@ const App = () => {
     return country.name.toLowerCase().indexOf(filter.toLowerCase()) > -1
   })
 
-  console.log(filteredCountries)
   return (
     <div>
       <Form filter={filter} setFilter={setFilter} />
