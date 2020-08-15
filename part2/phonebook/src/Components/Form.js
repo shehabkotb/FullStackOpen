@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import contactService from "../services/contacts.js"
 
 const Form = (props) => {
   const { setPersons, persons } = props
@@ -16,16 +17,43 @@ const Form = (props) => {
 
   const handleClick = (event) => {
     event.preventDefault()
-    if (persons.find((person) => person.name === newName))
-      window.alert(`${newName} is already added to the phonebook`)
-    else {
-      const newPerson = {
+    let contact
+    if ((contact = persons.find((person) => person.name === newName))) {
+      let confirmation = window.confirm(
+        `${newName} is already added to the phonebook, replace old number with new one?`
+      )
+
+      if (!confirmation) return
+
+      contactService
+        .updateContact({ ...contact, number: newNumber })
+        .then((newContact) => {
+          setNewName("")
+          setNewNumber("")
+          setPersons(
+            persons.map((person) =>
+              person.id !== newContact.id ? person : newContact
+            )
+          )
+        })
+        .catch((error) => {
+          window.alert("can't add right now try again later")
+          console.error(error)
+        })
+    } else {
+      const newContact = {
         name: newName,
         number: newNumber
       }
       setNewName("")
       setNewNumber("")
-      setPersons(persons.concat(newPerson))
+      contactService
+        .createContact(newContact)
+        .then((newContact) => setPersons(persons.concat(newContact)))
+        .catch((error) => {
+          window.alert("can't add right now try again later")
+          console.error(error)
+        })
     }
   }
 

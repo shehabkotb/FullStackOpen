@@ -1,7 +1,8 @@
 import React from "react"
+import Contact from "./Contact.js"
 
 const PhoneList = (props) => {
-  const { filter, persons } = props
+  const { filter, persons, setPersons } = props
 
   let personsList
   if (filter) {
@@ -13,9 +14,12 @@ const PhoneList = (props) => {
   }
 
   return personsList.map((person) => (
-    <li key={person.name}>
-      {person.name} {person.number}
-    </li>
+    <Contact
+      key={person.name}
+      contact={person}
+      persons={persons}
+      setPersons={setPersons}
+    />
   ))
 }
 

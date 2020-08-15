@@ -1,17 +1,18 @@
-import React, { useState } from "react"
-import Filter from "./Components/Filter.js"
-import PhoneList from "./Components/PhoneList.js"
-import Form from "./Components/Form.js"
+import React, { useState, useEffect } from "react"
+import Filter from "./components/Filter.js"
+import PhoneList from "./components/PhoneList.js"
+import Form from "./components/Form.js"
+import axios from "axios"
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456" },
-    { name: "Ada Lovelace", number: "39-44-5323523" },
-    { name: "Dan Abramov", number: "12-43-234345" },
-    { name: "Mary Poppendieck", number: "39-23-6423122" }
-  ])
-
+  const [persons, setPersons] = useState([])
   const [filter, setFilter] = useState("")
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3001/persons")
+      .then((response) => setPersons(response.data))
+  }, [])
 
   return (
     <div>
@@ -21,7 +22,7 @@ const App = () => {
       <Form setPersons={setPersons} persons={persons} />
       <h2>Numbers</h2>
       <ul>
-        <PhoneList filter={filter} persons={persons} />
+        <PhoneList filter={filter} persons={persons} setPersons={setPersons} />
       </ul>
     </div>
   )
