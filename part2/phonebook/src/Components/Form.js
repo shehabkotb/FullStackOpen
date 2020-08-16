@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import contactService from "../services/contacts.js"
 
 const Form = (props) => {
-  const { setPersons, persons } = props
+  const { setPersons, persons, setNotification } = props
 
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
@@ -30,6 +30,7 @@ const Form = (props) => {
         .then((newContact) => {
           setNewName("")
           setNewNumber("")
+          setNotification({ type: 0, message: newContact.name })
           setPersons(
             persons.map((person) =>
               person.id !== newContact.id ? person : newContact
@@ -37,7 +38,7 @@ const Form = (props) => {
           )
         })
         .catch((error) => {
-          window.alert("can't add right now try again later")
+          setNotification({ type: 1, message: contact.name })
           console.error(error)
         })
     } else {
@@ -47,11 +48,12 @@ const Form = (props) => {
       }
       setNewName("")
       setNewNumber("")
+      setNotification({ type: 0, message: newContact.name })
       contactService
         .createContact(newContact)
         .then((newContact) => setPersons(persons.concat(newContact)))
         .catch((error) => {
-          window.alert("can't add right now try again later")
+          setNotification({ type: 1, message: contact.name })
           console.error(error)
         })
     }
