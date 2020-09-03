@@ -30,7 +30,10 @@ const Form = (props) => {
         .then((newContact) => {
           setNewName("")
           setNewNumber("")
-          setNotification({ type: 0, message: newContact.name })
+          setNotification({
+            type: 0,
+            message: `${newContact.name} contact has been updated`
+          })
           setPersons(
             persons.map((person) =>
               person.id !== newContact.id ? person : newContact
@@ -38,7 +41,10 @@ const Form = (props) => {
           )
         })
         .catch((error) => {
-          setNotification({ type: 1, message: contact.name })
+          setNotification({
+            type: 1,
+            message: `${contact.name} was not found on server`
+          })
           console.error(error)
         })
     } else {
@@ -48,12 +54,17 @@ const Form = (props) => {
       }
       setNewName("")
       setNewNumber("")
-      setNotification({ type: 0, message: newContact.name })
       contactService
         .createContact(newContact)
-        .then((newContact) => setPersons(persons.concat(newContact)))
+        .then((newContact) => {
+          setPersons(persons.concat(newContact))
+          setNotification({
+            type: 0,
+            message: `${newContact.name} contact has been added`
+          })
+        })
         .catch((error) => {
-          setNotification({ type: 1, message: contact.name })
+          setNotification({ type: 1, message: error.response.data.error })
           console.error(error)
         })
     }

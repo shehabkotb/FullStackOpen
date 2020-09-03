@@ -12,10 +12,9 @@ const PhoneList = (props) => {
   } else {
     personsList = [...persons]
   }
-
   return personsList.map((person) => (
     <Contact
-      key={person.name}
+      key={person.id}
       contact={person}
       persons={persons}
       setPersons={setPersons}

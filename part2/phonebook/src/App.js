@@ -3,7 +3,7 @@ import Filter from "./components/Filter.js"
 import PhoneList from "./components/PhoneList.js"
 import Form from "./components/Form.js"
 import Notification from "./components/Notification.js"
-import axios from "axios"
+import contactService from "./services/contacts.js"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,9 +11,7 @@ const App = () => {
   const [notification, setNotification] = useState({ type: 0, message: "" }) // 0 green notification, 1 error
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => setPersons(response.data))
+    contactService.getAll().then((persons) => setPersons(persons))
   }, [])
 
   return (

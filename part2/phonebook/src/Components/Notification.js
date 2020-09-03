@@ -7,16 +7,12 @@ const Notification = (props) => {
     setTimeout(() => {
       setNotification({ type: 0, message: "" })
     }, 3000)
-  }, [])
+  }, [setNotification])
 
   if (notification.type === 0) {
-    return (
-      <div className="notification">{notification.message} Contact added</div>
-    )
+    return <div className="notification">{notification.message}</div>
   } else {
-    return (
-      <div className="error">{notification.message} is not found on server</div>
-    )
+    return <div className="error">{notification.message}</div>
   }
 }
 
