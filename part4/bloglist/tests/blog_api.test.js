@@ -29,14 +29,13 @@ test("blog has id property", async () => {
     .expect(200)
     .expect("content-type", /application\/json/)
 
-  debugger
   expect(result.body[0].id).toBeDefined()
 })
 
 test("blog created sucessfully", async () => {
   const newBlog = {
-    title: "React patterns",
-    author: "Michael Chan",
+    title: "Why Medium is a good platform",
+    author: "Michael Li",
     url: "https://reactpatterns.com/",
     likes: 7
   }
@@ -51,7 +50,74 @@ test("blog created sucessfully", async () => {
   expect(blogs).toHaveLength(helper.intialBlogs.length + 1)
 
   const titles = blogs.map((blog) => blog.title)
-  expect(titles).toContain("React patterns")
+  expect(titles).toContain("Why Medium is a good platform")
+})
+
+test("likes if non existent default to zero", async () => {
+  const newBlog = {
+    title: "Why Medium is a good platform",
+    author: "Michael Li",
+    url: "https://reactpatterns.com/"
+  }
+
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("content-type", /application\/json/)
+
+  const blogs = await helper.blogsInDB()
+  expect(blogs).toHaveLength(helper.intialBlogs.length + 1)
+
+  const testBlog = blogs.find(
+    (blog) => blog.title === "Why Medium is a good platform"
+  )
+  expect(testBlog.likes).toEqual(0)
+})
+
+test("400 on title or url of blog missing", async () => {
+  const newBlog = {
+    author: "Michael Li"
+  }
+
+  await api.post("/api/blogs").send(newBlog).expect(400)
+
+  const blogs = await helper.blogsInDB()
+  expect(blogs).toHaveLength(helper.intialBlogs.length)
+})
+
+test("deleting a blog works", async () => {
+  const blogs = await helper.blogsInDB()
+
+  const idToDelete = blogs[0].id
+  await api.delete(`/api/blogs/${idToDelete}`).expect(204)
+
+  const blogsAtEnd = await helper.blogsInDB()
+
+  expect(blogsAtEnd).toHaveLength(helper.intialBlogs.length - 1)
+})
+
+test("updating a note works", async () => {
+  const blogs = await helper.blogsInDB()
+  const blogToUpdate = blogs[0]
+
+  const updatedNote = {
+    title: "updated title",
+    likes: blogToUpdate.likes + 10
+  }
+
+  const result = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedNote)
+    .expect(200)
+    .expect("content-type", /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDB()
+  const testBlog = blogsAtEnd.find((blog) => blog.title === "updated title")
+
+  expect(testBlog.likes).toBe(blogToUpdate.likes + 10)
+  expect(result.body.title).toEqual("updated title")
+  expect(result.body.likes).toBe(blogToUpdate.likes + 10)
 })
 
 afterAll(() => {
