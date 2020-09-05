@@ -210,7 +210,6 @@ describe("most blogs", () => {
   })
 
   test("of test blogs", () => {
-    debugger
     const result = listHelper.mostBlogs(blogs)
 
     const expected = {

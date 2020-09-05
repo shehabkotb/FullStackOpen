@@ -7,19 +7,22 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
     "mongoose": "^5.10.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.2",
     "eslint": "^7.8.1",
     "jest": "^26.4.2",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "supertest": "^4.0.2"
   },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "debug": "nodemon --inspect index.js",
-    "test": "./node_modules/.bin/jest --verbose",
-    "test-debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
+    "test": "cross-env NODE_ENV=test ./node_modules/.bin/jest --verbose --runInBand",
+    "test-debug": "cross-env NODE_ENV=test node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
     "eslint": "node_modules/.bin/eslint ."
   },
   "keywords": [

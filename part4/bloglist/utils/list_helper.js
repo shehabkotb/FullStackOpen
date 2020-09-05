@@ -27,7 +27,6 @@ const maxOfObjectArray = (objectArray, compareProperty) => {
 }
 
 const mostBlogs = (blogs) => {
-  debugger
   const authors = blogs.reduce((authors, blog) => {
     const author = authors.find((element) => element.author === blog.author)
 
