@@ -4,11 +4,14 @@
   "description": "bloglist for fullstackopen",
   "main": "index.js",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
-    "mongoose": "^5.10.0"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.0",
+    "mongoose-unique-validator": "^2.0.3"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
@@ -19,10 +22,13 @@
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
+    "start-test": "cross-env NODE_ENV=test node --inspect index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "debug": "nodemon --inspect index.js",
     "test": "cross-env NODE_ENV=test ./node_modules/.bin/jest --verbose --runInBand",
+    "test-api": "cross-env NODE_ENV=test ./node_modules/.bin/jest --verbose --runInBand 'tests/blog_api.test.js'",
     "test-debug": "cross-env NODE_ENV=test node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
+    "test-debug-api": "cross-env NODE_ENV=test node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand 'tests/blog_api.test.js'",
     "eslint": "node_modules/.bin/eslint ."
   },
   "keywords": [
