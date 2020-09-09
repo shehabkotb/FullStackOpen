@@ -3,10 +3,20 @@ const supertest = require("supertest")
 const mongoose = require("mongoose")
 const Blog = require("../models/blog.js")
 const helper = require("./test_helper.js")
-const usersRouter = require("../controllers/users")
 const User = require("../models/user")
+const bcrypt = require("bcrypt")
 
 const api = supertest(app)
+
+beforeAll(async () => {
+  await User.deleteMany({})
+  const rootUser = new User({
+    username: "admin",
+    name: "fortesting",
+    password: await bcrypt.hash("sekret", 10)
+  })
+  await rootUser.save()
+})
 
 describe("blog rest api", () => {
   beforeEach(async () => {
@@ -43,9 +53,24 @@ describe("blog rest api", () => {
       likes: 7
     }
 
+    const user = {
+      username: "admin",
+      name: "fortesting",
+      password: "sekret"
+    }
+
+    const login = await api
+      .post("/login")
+      .send(user)
+      .expect(200)
+      .expect("content-type", /application\/json/)
+
+    expect(login.body.token).not.toBeFalsy()
+
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set("authorization", `bearer ${login.body.token}`)
       .expect(201)
       .expect("content-type", /application\/json/)
 
@@ -56,16 +81,31 @@ describe("blog rest api", () => {
     expect(titles).toContain("Why Medium is a good platform")
   })
 
-  test("likes if non existent default to zero", async () => {
+  test("likes default to zero", async () => {
     const newBlog = {
       title: "Why Medium is a good platform",
       author: "Michael Li",
       url: "https://reactpatterns.com/"
     }
 
+    const user = {
+      username: "admin",
+      name: "fortesting",
+      password: "sekret"
+    }
+
+    const login = await api
+      .post("/login")
+      .send(user)
+      .expect(200)
+      .expect("content-type", /application\/json/)
+
+    expect(login.body.token).not.toBeFalsy()
+
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set("authorization", `bearer ${login.body.token}`)
       .expect(201)
       .expect("content-type", /application\/json/)
 
@@ -78,7 +118,7 @@ describe("blog rest api", () => {
     expect(testBlog.likes).toEqual(0)
   })
 
-  test("400 on title or url of blog missing", async () => {
+  test("reject blog with title or url missing", async () => {
     const newBlog = {
       author: "Michael Li"
     }
@@ -90,17 +130,49 @@ describe("blog rest api", () => {
   })
 
   test("deleting a blog works", async () => {
-    const blogs = await helper.blogsInDB()
+    const newBlog = {
+      title: "Why Medium is a good platform",
+      author: "Michael Li",
+      url: "https://reactpatterns.com/",
+      likes: 7
+    }
 
-    const idToDelete = blogs[0].id
-    await api.delete(`/api/blogs/${idToDelete}`).expect(204)
+    const user = {
+      username: "admin",
+      name: "fortesting",
+      password: "sekret"
+    }
+
+    const login = await api
+      .post("/login")
+      .send(user)
+      .expect(200)
+      .expect("content-type", /application\/json/)
+
+    expect(login.body.token).not.toBeFalsy()
+
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .set("authorization", `bearer ${login.body.token}`)
+      .expect(201)
+      .expect("content-type", /application\/json/)
+
+    const blogToDelete = await Blog.findOne({
+      title: "Why Medium is a good platform"
+    })
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set("authorization", `bearer ${login.body.token}`)
+      .expect(204)
 
     const blogsAtEnd = await helper.blogsInDB()
 
-    expect(blogsAtEnd).toHaveLength(helper.intialBlogs.length - 1)
+    expect(blogsAtEnd).toHaveLength(helper.intialBlogs.length)
   })
 
-  test("updating a note works", async () => {
+  test("updating a blog works", async () => {
     const blogs = await helper.blogsInDB()
     const blogToUpdate = blogs[0]
 
@@ -122,101 +194,41 @@ describe("blog rest api", () => {
     expect(result.body.title).toEqual("updated title")
     expect(result.body.likes).toBe(blogToUpdate.likes + 10)
   })
-})
 
-describe("user rest api", () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
-    const rootUser = new User({
-      username: "admin",
-      name: "fortesting",
-      password: "sekret"
-    })
-    await rootUser.save()
-  })
-
-  test("creating A user works", async () => {
-    const user = {
-      username: "newuser",
-      name: "testUser",
-      password: "sekret"
+  test("reject creating a blog without token", async () => {
+    const newBlog = {
+      title: "Why Medium is a good platform",
+      author: "Michael Li",
+      url: "https://reactpatterns.com/"
     }
 
     const result = await api
-      .post("/api/users")
-      .send(user)
-      .expect(201)
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(401)
       .expect("content-type", /application\/json/)
 
-    const dbAtEnd = await helper.usersInDB()
-
-    expect(dbAtEnd).toHaveLength(2)
-    const users = dbAtEnd.map((user) => user.username)
-    expect(users).toContain("newuser")
+    expect(result.body.error).toEqual("missing or invalid token")
   })
 
-  test("get all users", async () => {
-    const result = await api
-      .get("/api/users")
-      .expect(200)
-      .expect("content-type", /application\/json/)
-
-    const users = await result.body.map((user) => user.username)
-    expect(users).toContain("admin")
-  })
-
-  test("rejected user with short password", async () => {
-    const testUser = {
-      username: "new",
-      name: "testUser",
-      password: "se"
+  test("reject creating a blog with invalid token", async () => {
+    const newBlog = {
+      title: "Why Medium is a good platform",
+      author: "Michael Li",
+      url: "https://reactpatterns.com/"
     }
 
     const result = await api
-      .post("/api/users")
-      .send(testUser)
-      .expect(400)
+      .post("/api/blogs")
+      .send(newBlog)
+      .set(
+        "Authorization",
+        "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpxaG4gRG9lIiwiaWQiOiIxNTE2MTE1MTQifQ.A14cFYdB1thAezxXy0mj0ldNynDqk2USSyLws-_ENsU"
+      )
+      .expect(401)
       .expect("content-type", /application\/json/)
 
-    expect(result.body.error).toEqual(
-      "password should be at least 3 characters long"
-    )
-    const dbAtEnd = await helper.usersInDB()
-    expect(dbAtEnd).toHaveLength(1)
-  })
-
-  test("rejected user with short username", async () => {
-    const testUser = {
-      username: "ne",
-      name: "testUser",
-      password: "sekret"
-    }
-
-    const result = await api
-      .post("/api/users")
-      .send(testUser)
-      .expect(400)
-      .expect("content-type", /application\/json/)
-
-    const dbAtEnd = await helper.usersInDB()
-    expect(dbAtEnd).toHaveLength(1)
-  })
-
-  test("rejected user with duplicate username", async () => {
-    const testUser = {
-      username: "admin",
-      name: "testUser",
-      password: "sekret"
-    }
-
-    const result = await api
-      .post("/api/users")
-      .send(testUser)
-      .expect(400)
-      .expect("content-type", /application\/json/)
-
-    const dbAtEnd = await helper.usersInDB()
-    expect(dbAtEnd).toHaveLength(1)
+    expect(result.body.error).toEqual("missing or invalid token")
   })
 })
 
