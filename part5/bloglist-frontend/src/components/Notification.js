@@ -4,7 +4,7 @@ const Notification = (props) => {
   const notification = props.notification
   const setNotification = props.setNotification
 
-  if (notification != null) {
+  if (notification !== null) {
     setTimeout(() => {
       setNotification(null)
     }, 5000)

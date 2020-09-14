@@ -1,8 +1,9 @@
 import React from "react"
-import blogService from "../services/blogs.js"
+// import blogService from "../services/blogs.js"
 
 const BlogsForm = (props) => {
   const setNotification = props.setNotification
+  const createBlog = props.createBlog
 
   const handleNewBlog = async (event) => {
     event.preventDefault()
@@ -12,7 +13,7 @@ const BlogsForm = (props) => {
       url: event.target.url.value
     }
 
-    const blog = await blogService.create(newBlog)
+    const blog = await createBlog(newBlog)
     setNotification({
       type: "success",
       message: `A new blog ${blog.title} by ${blog.author} added`

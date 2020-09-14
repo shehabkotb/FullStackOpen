@@ -6,17 +6,16 @@ const LoginForm = (props) => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const setNotification = props.setNotification
-
   const setUser = props.setUser
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
       const user = await loginService.login({ username, password })
-
-      setUser(user)
       blogService.setToken(user.token)
       window.localStorage.setItem("loggedBlogsappUser", JSON.stringify(user))
+      setUser(user)
       setUsername("")
       setPassword("")
     } catch (exception) {
