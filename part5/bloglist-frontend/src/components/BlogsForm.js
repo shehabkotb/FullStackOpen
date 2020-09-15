@@ -7,10 +7,11 @@ const BlogsForm = (props) => {
 
   const handleNewBlog = async (event) => {
     event.preventDefault()
+
     const newBlog = {
-      title: event.target.title.value,
-      author: event.target.author.value,
-      url: event.target.url.value
+      title: event.target.elements.title.value,
+      author: event.target.elements.author.value,
+      url: event.target.elements.url.value
     }
 
     const blog = await createBlog(newBlog)
@@ -21,18 +22,18 @@ const BlogsForm = (props) => {
   }
   return (
     <div>
-      <form onSubmit={handleNewBlog}>
+      <form data-testid="form-input" onSubmit={handleNewBlog}>
         <div>
           <label htmlFor="title">title:</label>
-          <input type="text" name="title"></input>
+          <input data-testid="title-input" type="text" name="title"></input>
         </div>
         <div>
           <label htmlFor="author">author:</label>
-          <input type="text" name="author"></input>
+          <input data-testid="author-input" type="text" name="author"></input>
         </div>
         <div>
           <label htmlFor="url">url:</label>
-          <input type="text" name="url"></input>
+          <input data-testid="url-input" type="text" name="url"></input>
         </div>
         <button type="submit">submit</button>
       </form>
