@@ -1,16 +1,17 @@
 import React, { useState } from "react"
 import PropTypes from "prop-types"
+import "./Blog.css"
 
 const Blog = ({ blog, likeBlog, removeBlog, user }) => {
   const [visible, setVisible] = useState(false)
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5
-  }
+  // const blogStyle = {
+  //   paddingTop: 10,
+  //   paddingLeft: 2,
+  //   border: "solid",
+  //   borderWidth: 1,
+  //   marginBottom: 5
+  // }
 
   const toggleVisibility = () => {
     setVisible(!visible)
@@ -32,7 +33,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
 
   if (visible === false)
     return (
-      <div style={blogStyle}>
+      <div className="Blog-div">
         {blog.title} {blog.author}
         <button onClick={toggleVisibility}> view </button>
       </div>
@@ -41,7 +42,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
   const removeButton = <button onClick={handleRemove}>remove</button>
 
   return (
-    <div style={blogStyle}>
+    <div className="Blog-div">
       {blog.title} {blog.author}{" "}
       <button onClick={toggleVisibility}> hide </button>
       <div className="url-div">{blog.url}</div>

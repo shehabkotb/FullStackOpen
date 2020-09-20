@@ -30,7 +30,7 @@ const LoginForm = (props) => {
   return (
     <div>
       <h1>log in to application</h1>
-      <form>
+      <form onSubmit={handleLogin}>
         <label htmlFor="username">username:</label>
         <br />
         <input
@@ -51,9 +51,7 @@ const LoginForm = (props) => {
           name="password"
         ></input>
         <br />
-        <button type="submit" onClick={handleLogin}>
-          login
-        </button>
+        <button type="submit">login</button>
       </form>
     </div>
   )

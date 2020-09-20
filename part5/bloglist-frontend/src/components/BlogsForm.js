@@ -25,15 +25,15 @@ const BlogsForm = (props) => {
       <form data-testid="form-input" onSubmit={handleNewBlog}>
         <div>
           <label htmlFor="title">title:</label>
-          <input data-testid="title-input" type="text" name="title"></input>
+          <input data-testid="title-input" type="text" id="title"></input>
         </div>
         <div>
           <label htmlFor="author">author:</label>
-          <input data-testid="author-input" type="text" name="author"></input>
+          <input data-testid="author-input" type="text" id="author"></input>
         </div>
         <div>
           <label htmlFor="url">url:</label>
-          <input data-testid="url-input" type="text" name="url"></input>
+          <input data-testid="url-input" type="text" id="url"></input>
         </div>
         <button type="submit">submit</button>
       </form>
